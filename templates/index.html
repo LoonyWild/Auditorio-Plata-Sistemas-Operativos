@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditorio Plata - Lo mejor del espectáculo en vivo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2pdf Library for PDF Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        auditorioRed: '#E30613',
+                        auditorioRedHover: '#C20410',
+                        auditorioBlack: '#111111',
+                        auditorioGray: '#F4F4F6',
+                        auditorioDarkGray: '#222222',
+                        auditorioGold: '#D4AF37',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .banner-hero {
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(17,17,17,0.85) 100%), 
+                        url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .terminal-scroll::-webkit-scrollbar { width: 6px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: #1a1a1a; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #E30613; border-radius: 3px; }
+
+        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-auditorioGray text-auditorioBlack font-sans antialiased min-h-screen flex flex-col selection:bg-auditorioRed selection:text-white">
+
+    <!-- BARRA SUPERIOR DE UTILIDADES -->
+    <div class="bg-white border-b border-gray-200 text-xs py-1.5 px-4 md:px-12 flex justify-between items-center">
+        <!-- Switch de Recinto -->
+        <div class="flex items-center space-x-2">
+            <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="bg-auditorioRed text-white px-3 py-1 rounded-full font-bold flex items-center space-x-1 shadow-sm">
+                <i data-lucide="map-pin" class="w-3 h-3"></i>
+                <span>Auditorio Plata</span>
+            </button>
+            <button onclick="avisoSeccion(event, 'Lunario Plata')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition flex items-center space-x-1">
+                <i data-lucide="moon" class="w-3 h-3 text-purple-600"></i>
+                <span>Lunario Plata</span>
+            </button>
+        </div>
+
+        <!-- Enlaces Rápidos Derecha -->
+        <div class="hidden md:flex items-center space-x-6 text-gray-600 font-medium">
+            <a href="#" onclick="avisoSeccion(event, 'Sección informativa')" class="hover:text-auditorioRed transition flex items-center space-x-1">
+                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+                <span>Tienda Oficial</span>
+            </a>
+            <a href="#" onclick="avisoSeccion(event, 'Sección informativa')" class="hover:text-auditorioRed transition flex items-center space-x-1">
+                <i data-lucide="rotate-3d" class="w-3.5 h-3.5"></i>
+                <span>Recorrido Virtual 360°</span>
+            </a>
+            <a href="#simulador" onclick="toggleSpawnerModal()" class="text-auditorioRed font-bold flex items-center space-x-1 bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                <span>Simulador de Preventa SO</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ENCABEZADO PRINCIPAL Y NAVEGACIÓN -->
+    <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+            
+            <!-- Logo Auditorio Plata -->
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="bg-auditorioRed text-white p-2 rounded-lg font-black tracking-tighter text-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                    <span class="border-2 border-white px-1">AP</span>
+                </div>
+                <div>
+                    <span class="text-xl md:text-28 font-black tracking-tight block uppercase text-auditorioBlack leading-none">
+                        AUDITORIO <span class="text-auditorioRed">PLATA</span>
+                    </span>
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold block">Zacatecas • México</span>
+                </div>
+            </a>
+
+            <!-- Menú Principal -->
+            <nav class="hidden lg:flex items-center space-x-7 font-bold text-xs uppercase tracking-wider text-auditorioBlack">
+                <a href="#cartelera" class="text-auditorioRed border-b-2 border-auditorioRed pb-1">Cartelera</a>
+                <a href="#experiencia" onclick="avisoSeccion(event, 'experiencia')" class="hover:text-auditorioRed transition pb-1">La Experiencia Previa</a>
+                <a href="#servicios" onclick="avisoSeccion(event, 'servicios')" class="hover:text-auditorioRed transition pb-1">Servicios</a>
+                <a href="#faq" onclick="avisoSeccion(event, 'faq')" class="hover:text-auditorioRed transition pb-1">Preguntas Frecuentes</a>
+                <a href="#ninos" onclick="avisoSeccion(event, 'ninos')" class="text-purple-600 hover:text-purple-800 transition pb-1 flex items-center space-x-0.5">
+                    <span>Auditorio</span>
+                    <span class="font-black text-pink-500">NIÑOS</span>
+                </a>
+            </nav>
+
+            <!-- Acciones -->
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSpawnerModal()" class="bg-auditorioBlack hover:bg-auditorioRed text-white text-xs font-bold px-3 py-2 rounded-md transition flex items-center space-x-1.5 shadow">
+                    <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
+                    <span class="hidden sm:inline">Modo Preventa Spawner</span>
+                </button>
+                <button class="text-gray-700 hover:text-auditorioRed p-2 rounded-full hover:bg-gray-100 transition">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- BANNER HERO -->
+    <section class="banner-hero text-white py-20 md:py-32 px-4 relative flex items-end justify-center min-h-[420px]">
+        <div class="max-w-5xl text-center space-y-4 fade-in">
+            <span class="bg-auditorioRed text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full inline-block shadow-lg">
+                SIMULACIÓN ACADÉMICA • AFORO EN ORACLE XE
+            </span>
+            <h1 class="text-3xl md:text-6xl font-black uppercase tracking-tight leading-none drop-shadow-md">
+                Un recinto icónico de clase mundial
+            </h1>
+            <p class="text-gray-200 text-sm md:text-base max-w-2xl mx-auto font-medium">
+                Sincronización de transacciones en tiempo real con respaldo de concurrencia y asignación atómica de boletos.
+            </p>
+
+            <!-- Dashboard de Aforo en Vivo -->
+            <div class="pt-6 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
+                <div class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="text-gray-400 text-[10px] uppercase font-bold block">Aforo Total</span>
+                    <span id="stat-aforo-total" class="text-lg md:text-2xl font-black text-white">20,000</span>
+                    <span class="text-[10px] text-gray-300 block">Capacidad Base de Datos</span>
+                </div>
+                <div class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="text-gray-400 text-[10px] uppercase font-bold block">Boletos Emitidos</span>
+                    <span id="stat-vendidos" class="text-lg md:text-2xl font-black text-emerald-400">...</span>
+                    <span class="text-[10px] text-gray-300 block">Confirmados en Oracle</span>
+                </div>
+                <div class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="text-gray-400 text-[10px] uppercase font-bold block">Disponibles</span>
+                    <span id="stat-disponibles" class="text-lg md:text-2xl font-black text-yellow-400">...</span>
+                    <span class="text-[10px] text-gray-300 block">En Preventa</span>
+                </div>
+                <div class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10">
+                    <span class="text-gray-400 text-[10px] uppercase font-bold block">Estado BD</span>
+                    <span id="badge-estado-bd" class="text-xs font-bold text-green-400 flex items-center space-x-1 mt-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                        <span>Consultando Oracle...</span>
+                    </span>
+                    <span class="text-[10px] text-gray-300 block">Oracle 21c XE</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN CARTELERA COMPLETA -->
+    <main id="cartelera" class="max-w-7xl mx-auto px-4 md:px-8 py-10 flex-grow w-full">
+        
+        <!-- Header Cartelera & Búsqueda -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-auditorioBlack">Cartelera</h2>
+                <p class="text-gray-600 text-sm font-medium">Encuentra lo mejor del espectáculo en vivo</p>
+            </div>
+
+            <div class="flex items-center w-full md:w-auto">
+                <input id="buscador-conciertos" type="text" placeholder="Busca tu espectáculo..." class="bg-gray-100 border border-gray-300 text-sm px-4 py-2.5 rounded-l-md w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-auditorioRed">
+                <button onclick="filtrarCartelera()" class="bg-auditorioRed hover:bg-auditorioRedHover text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-r-md transition flex items-center space-x-1">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span>BUSCAR</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Pestañas de Meses -->
+        <div class="flex overflow-x-auto space-x-1 pb-4 mb-8 text-xs font-bold uppercase tracking-wider no-scrollbar">
+            <button data-filtro-mes="10" onclick="filtroMes('10')" class="bg-auditorioBlack text-white px-5 py-2.5 rounded-t-sm whitespace-nowrap shadow-sm">OCT</button>
+            <button data-filtro-mes="11" onclick="filtroMes('11')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">NOV</button>
+            <button data-filtro-mes="12" onclick="filtroMes('12')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition border-b-2 border-auditorioRed text-auditorioRed">DIC (PREVENTA)</button>
+            <button data-filtro-mes="2027" onclick="filtroMes('2027')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">2027</button>
+            <button data-filtro-mes="01" onclick="filtroMes('01')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">ENE</button>
+            <button data-filtro-mes="02" onclick="filtroMes('02')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">FEB</button>
+            <button data-filtro-mes="03" onclick="filtroMes('03')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">MAR</button>
+            <button data-filtro-mes="04" onclick="filtroMes('04')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">ABR</button>
+            <button data-filtro-mes="05" onclick="filtroMes('05')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">MAY</button>
+            <button data-filtro-mes="06" onclick="filtroMes('06')" class="bg-white hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-t-sm whitespace-nowrap transition">JUN</button>
+        </div>
+
+        <!-- TARJETA DESTACADA PREVENTA (JUAN GABRIEL) -->
+        <div data-card-evento="1" data-mes="12" class="bg-gradient-to-br from-slate-900 via-auditorioBlack to-red-950 rounded-2xl p-6 md:p-8 text-white mb-10 shadow-xl border border-amber-500/30 relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row items-center gap-8 relative z-10">
+                <div class="w-full lg:w-1/3 relative rounded-xl overflow-hidden shadow-2xl border-2 border-amber-400/40 group">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop" alt="Juan Gabriel Concierto Navideño" class="w-full h-80 object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-lg flex items-center space-x-1">
+                        <i data-lucide="star" class="w-3 h-3 fill-black"></i>
+                        <span>PREVENTA EXCLUSIVA OFICIAL</span>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-2/3 space-y-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="bg-auditorioRed text-white text-xs font-bold px-3 py-1 rounded-md uppercase">EVENTO ESTRELLA SO</span>
+                        <span class="bg-white/10 text-amber-300 text-xs font-bold px-3 py-1 rounded-md border border-amber-400/30">Control de Folio Atómico</span>
+                    </div>
+
+                    <h3 class="text-3xl md:text-5xl font-black tracking-tight text-white uppercase font-serif">
+                        Juan Gabriel - Concierto Navideño
+                    </h3>
+                    
+                    <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                        Homenaje monumental en vivo. Práctica de boletos gratuitos con firma criptográfica en código QR, control estricto de aforo e integración con algoritmos de sincronización de Sistemas Operativos.
+                    </p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2 text-xs">
+                        <div class="bg-white/5 p-3 rounded-lg border border-white/10">
+                            <span class="text-gray-400 block font-bold">FECHA Y HORA</span>
+                            <span class="text-white font-black text-sm">28 DIC • 20:00 HRS</span>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-lg border border-white/10">
+                            <span class="text-gray-400 block font-bold">ZONAS (VALORES DE DEMOSTRACIÓN)</span>
+                            <span class="text-amber-400 font-black text-sm">$300 - $1,800 (referencia)</span>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-lg border border-white/10 col-span-2 md:col-span-1">
+                            <span class="text-gray-400 block font-bold">DISPONIBILIDAD REAL BD</span>
+                            <span id="card-disponibles" class="text-green-400 font-black text-sm">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 pt-4">
+                        <button id="btn-comprar-principal" onclick="abrirModalCompra(1)" class="bg-auditorioRed hover:bg-auditorioRedHover text-white font-black text-xs uppercase tracking-wider px-8 py-4 rounded-md transition shadow-lg flex items-center space-x-2">
+                            <i data-lucide="ticket" class="w-4 h-4"></i>
+                            <span>RESERVA TU BOLETO GRATUITO</span>
+                        </button>
+                        
+                        <button onclick="toggleSpawnerModal()" class="bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-md transition border border-white/20 flex items-center space-x-2">
+                            <i data-lucide="play" class="w-4 h-4 text-yellow-400"></i>
+                            <span>PRUEBA DE ESTRÉS (100 HILOS)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p id="cartelera-vacia" class="hidden text-center text-sm text-red-700 bg-red-50 rounded-lg p-4 mb-6">No hay conciertos en este filtro.</p>
+        <!-- GRID DE EVENTOS RESTAURADO (TODOS LOS ARTISTAS) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- EVENTO 1: Jesse & Joy -->
+            <div data-card-evento="2" data-mes="10" class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 flex flex-col justify-between hover:shadow-xl transition group">
+                <div>
+                    <div class="relative h-60 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600&auto=format&fit=crop" alt="Jesse & Joy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3 bg-black/80 text-white text-[11px] font-bold px-3 py-1 rounded-md flex items-center space-x-1">
+                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                            <span>21 OCT • 20:30 HRS</span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-xl font-serif font-bold text-auditorioBlack">Jesse & Joy</h4>
+                        <p class="text-gray-500 text-xs font-semibold mb-3">El Despecho Tour</p>
+                        <p class="text-gray-600 text-xs leading-relaxed">Disfruta de los más grandes éxitos románticos en una velada inolvidable.</p>
+                    </div>
+                </div>
+                                <div data-estado-evento="2" class="px-5 pb-3 text-xs font-semibold text-gray-600">Consultando disponibilidad en Oracle...</div>
+                <div class="p-5 pt-0 flex items-center space-x-2">
+                    <button onclick="verMasEvento(2)" class="w-1/3 bg-black hover:bg-gray-800 text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">VER MÁS</button>
+                    <button onclick="abrirModalCompra(2)" class="w-2/3 bg-auditorioRed hover:bg-auditorioRedHover text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">BOLETO GRATIS</button>
+                </div>
+            </div>
+
+            <!-- EVENTO 2: Edith Márquez -->
+            <div data-card-evento="3" data-mes="10" class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 flex flex-col justify-between hover:shadow-xl transition group">
+                <div>
+                    <div class="relative h-60 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=600&auto=format&fit=crop" alt="Edith Márquez" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3 bg-black/80 text-white text-[11px] font-bold px-3 py-1 rounded-md flex items-center space-x-1">
+                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                            <span>22 OCT • 20:30 HRS</span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-xl font-serif font-bold text-auditorioBlack">Edith Márquez</h4>
+                        <p class="text-gray-500 text-xs font-semibold mb-3">Gira 2026</p>
+                        <p class="text-gray-600 text-xs leading-relaxed">Una voz privilegiada que conmoverá al recinto entero con mariachi y mariachi pop.</p>
+                    </div>
+                </div>
+                                <div data-estado-evento="3" class="px-5 pb-3 text-xs font-semibold text-gray-600">Consultando disponibilidad en Oracle...</div>
+                <div class="p-5 pt-0 flex items-center space-x-2">
+                    <button onclick="verMasEvento(3)" class="w-1/3 bg-black hover:bg-gray-800 text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">VER MÁS</button>
+                    <button onclick="abrirModalCompra(3)" class="w-2/3 bg-auditorioRed hover:bg-auditorioRedHover text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">BOLETO GRATIS</button>
+                </div>
+            </div>
+
+            <!-- EVENTO 3: Andrés Obregón -->
+            <div data-card-evento="4" data-mes="10" class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 flex flex-col justify-between hover:shadow-xl transition group">
+                <div>
+                    <div class="relative h-60 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=600&auto=format&fit=crop" alt="Andrés Obregón" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3 bg-black/80 text-white text-[11px] font-bold px-3 py-1 rounded-md flex items-center space-x-1">
+                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                            <span>23 OCT • 20:30 HRS</span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-xl font-serif font-bold text-auditorioBlack">Andrés Obregón</h4>
+                        <p class="text-gray-500 text-xs font-semibold mb-3">Concierto Acústico</p>
+                        <p class="text-gray-600 text-xs leading-relaxed">Canciones del alma, letras íntimas e historias cantadas por primera vez en este escenario.</p>
+                    </div>
+                </div>
+                                <div data-estado-evento="4" class="px-5 pb-3 text-xs font-semibold text-gray-600">Consultando disponibilidad en Oracle...</div>
+                <div class="p-5 pt-0 flex items-center space-x-2">
+                    <button onclick="verMasEvento(4)" class="w-1/3 bg-black hover:bg-gray-800 text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">VER MÁS</button>
+                    <button onclick="abrirModalCompra(4)" class="w-2/3 bg-auditorioRed hover:bg-auditorioRedHover text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">BOLETO GRATIS</button>
+                </div>
+            </div>
+
+            <!-- EVENTO 4: Gloria Trevi -->
+            <div data-card-evento="5" data-mes="10" class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 flex flex-col justify-between hover:shadow-xl transition group">
+                <div>
+                    <div class="relative h-60 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=600&auto=format&fit=crop" alt="Gloria Trevi" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3 bg-black/80 text-white text-[11px] font-bold px-3 py-1 rounded-md flex items-center space-x-1">
+                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                            <span>24 OCT • 20:00 HRS</span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-xl font-serif font-bold text-auditorioBlack">Gloria Trevi</h4>
+                        <p class="text-gray-500 text-xs font-semibold mb-3">Celebration Tour</p>
+                        <p class="text-gray-600 text-xs leading-relaxed">Espectáculo visual sin precedentes con más de 20 bailarines en escena.</p>
+                    </div>
+                </div>
+                                <div data-estado-evento="5" class="px-5 pb-3 text-xs font-semibold text-gray-600">Consultando disponibilidad en Oracle...</div>
+                <div class="p-5 pt-0 flex items-center space-x-2">
+                    <button onclick="verMasEvento(5)" class="w-1/3 bg-black hover:bg-gray-800 text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">VER MÁS</button>
+                    <button onclick="abrirModalCompra(5)" class="w-2/3 bg-auditorioRed hover:bg-auditorioRedHover text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">BOLETO GRATIS</button>
+                </div>
+            </div>
+
+            <!-- EVENTO 5: Pimpinela -->
+            <div data-card-evento="6" data-mes="10" class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-200 flex flex-col justify-between hover:shadow-xl transition group">
+                <div>
+                    <div class="relative h-60 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1465847899084-d164df4dedc6?q=80&w=600&auto=format&fit=crop" alt="Pimpinela" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 left-3 bg-black/80 text-white text-[11px] font-bold px-3 py-1 rounded-md flex items-center space-x-1">
+                            <i data-lucide="calendar" class="w-3 h-3"></i>
+                            <span>25 OCT • 19:00 HRS</span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-xl font-serif font-bold text-auditorioBlack">Pimpinela</h4>
+                        <p class="text-gray-500 text-xs font-semibold mb-3">Gira Leyendas</p>
+                        <p class="text-gray-600 text-xs leading-relaxed">Los dúos teatrales más famosos de Hispanoamérica en un show lleno de nostalgia.</p>
+                    </div>
+                </div>
+                                <div data-estado-evento="6" class="px-5 pb-3 text-xs font-semibold text-gray-600">Consultando disponibilidad en Oracle...</div>
+                <div class="p-5 pt-0 flex items-center space-x-2">
+                    <button onclick="verMasEvento(6)" class="w-1/3 bg-black hover:bg-gray-800 text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">VER MÁS</button>
+                    <button onclick="abrirModalCompra(6)" class="w-2/3 bg-auditorioRed hover:bg-auditorioRedHover text-white font-bold text-[10px] uppercase tracking-wider py-3 rounded text-center">BOLETO GRATIS</button>
+                </div>
+            </div>
+
+            <!-- EVENTO 6: TABLA DE PRECIOS Y ZONAS -->
+            <div class="bg-gradient-to-b from-purple-900 to-purple-950 text-white rounded-xl overflow-hidden shadow-xl border border-purple-700/50 flex flex-col justify-between p-6">
+                <div>
+                    <div class="flex justify-between items-center border-b border-purple-700/60 pb-3 mb-4">
+                        <span class="text-xs font-black uppercase tracking-wider text-purple-300">TARIFAS DE DEMOSTRACIÓN</span>
+                        <span class="text-[10px] bg-purple-800 px-2 py-0.5 rounded font-mono">ZONAS Y AFORO</span>
+                    </div>
+
+                    <h4 class="text-2xl font-serif font-bold mb-1">Auditorio Plata</h4>
+                    <p class="text-purple-200 text-xs mb-4">Distribución de Asientos por Secciones</p>
+
+                    <div class="space-y-2 text-xs font-medium">
+                        <div class="flex justify-between py-1.5 border-b border-purple-800/50">
+                            <span class="text-purple-200">Preferente / Planta Baja</span>
+                            <span class="font-bold text-amber-300">$1,800 MXN</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-purple-800/50">
+                            <span class="text-purple-200">Primer Piso C</span>
+                            <span class="font-bold text-white">$550 MXN</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-purple-800/50">
+                            <span class="text-purple-200">Primer Piso D</span>
+                            <span class="font-bold text-white">$450 MXN</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-purple-800/50">
+                            <span class="text-purple-200">Segundo Piso A</span>
+                            <span class="font-bold text-white">$450 MXN</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-purple-800/50">
+                            <span class="text-purple-200">Segundo Piso B</span>
+                            <span class="font-bold text-white">$400 MXN</span>
+                        </div>
+                        <div class="flex justify-between py-1.5 border-b border-purple-800/50">
+                            <span class="text-purple-200">Segundo Piso C y D</span>
+                            <span class="font-bold text-white">$300 MXN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <button onclick="abrirModalCompra(1)" class="w-full bg-auditorioRed hover:bg-auditorioRedHover text-white font-black text-xs uppercase tracking-wider py-3.5 rounded-lg transition text-center shadow-lg flex items-center justify-center space-x-2">
+                        <i data-lucide="ticket" class="w-4 h-4"></i>
+                        <span>RESERVAR Cupo real de Oracle</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER ESTILO AUDITORIO NACIONAL -->
+    <footer class="bg-auditorioBlack text-white pt-12 pb-8 border-t-4 border-auditorioRed">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-gray-800 text-xs">
+                
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <div class="bg-auditorioRed text-white p-1.5 rounded font-black text-sm">AP</div>
+                        <span class="text-lg font-black tracking-tight">AUDITORIO PLATA</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed">
+                        El recinto de espectáculos más avanzado con tecnología de control concurrente transaccional.
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold uppercase text-auditorioRed mb-3">RECINTO</h5>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Historia e Infraestructura</a></li>
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Ubicación y Accesos</a></li>
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Reglamento Interno</a></li>
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Sostenibilidad</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-bold uppercase text-auditorioRed mb-3">SISTEMAS OPERATIVOS</h5>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Algoritmo Filósofos Comensales (laboratorio)</a></li>
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Monitores y Variables de Condición</a></li>
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Bloqueos de fila FOR UPDATE</a></li>
+                        <li><a href="#" onclick="avisoSeccion(event, 'Contenido demostrativo')" class="hover:text-white transition">Integridad ACID en Oracle XE</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-bold uppercase text-auditorioRed mb-3">ATENCIÓN A CLIENTES</h5>
+                    <p class="text-gray-400 mb-2">Taquillas abiertas de Lunes a Domingo de 10:00 a 19:00 hrs.</p>
+                    <span class="text-amber-400 font-bold block text-sm">+52 (492) 921-0000</span>
+                </div>
+            </div>
+
+            <div class="pt-6 flex flex-col md:flex-row justify-between items-center text-[11px] text-gray-500">
+                <p>© 2026 Auditorio Plata. Todos los derechos reservados. Proyecto Académico de Sistemas Operativos.</p>
+                <div class="flex space-x-4 mt-2 md:mt-0">
+                    <a href="#" onclick="avisoSeccion(event, 'Información legal de demostración')" class="hover:text-gray-300">Términos y Condiciones</a>
+                    <a href="#" onclick="avisoSeccion(event, 'Información legal de demostración')" class="hover:text-gray-300">Aviso de Privacidad</a>
+                    <a href="#" onclick="avisoSeccion(event, 'Información legal de demostración')" class="hover:text-gray-300">Políticas de Boleta</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: COMPRA DE BOLETOS -->
+    <div id="modal-compra" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
+            
+            <button onclick="cerrarModalCompra()" class="absolute top-4 right-4 text-gray-400 hover:text-black p-2 rounded-full hover:bg-gray-100 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Paso 1: Formulario de Selección -->
+            <div id="paso-formulario">
+                <div class="flex items-center space-x-2 text-auditorioRed font-bold text-xs uppercase mb-2">
+                    <i data-lucide="ticket" class="w-4 h-4"></i>
+                    <span>EMISIÓN OFICIAL EN TIEMPO REAL</span>
+                </div>
+                
+                <h3 id="modal-titulo-evento" class="text-2xl md:text-3xl font-black text-auditorioBlack font-serif mb-1">
+                    Juan Gabriel - Concierto Navideño
+                </h3>
+
+                <div class="space-y-4 text-sm mt-4">
+                    <div>
+                        <label class="block font-bold text-gray-700 text-xs uppercase mb-1">Zona del Auditorio</label>
+                        <select id="select-zona" onchange="recalcularTotalModal()" class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 font-semibold focus:ring-2 focus:ring-auditorioRed focus:outline-none">
+                            <option value="Preferente Planta Baja">Preferente Planta Baja ($1,800 MXN)</option>
+                            <option value="Primer Piso C">Primer Piso C ($550 MXN)</option>
+                            <option value="Primer Piso D">Primer Piso D ($450 MXN)</option>
+                            <option value="Segundo Piso A">Segundo Piso A ($450 MXN)</option>
+                            <option value="Segundo Piso B">Segundo Piso B ($400 MXN)</option>
+                            <option value="Segundo Piso C y D">Segundo Piso C y D ($300 MXN)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-bold text-gray-700 text-xs uppercase mb-1">Cantidad de Boletos</label>
+                            <select id="select-cantidad" onchange="recalcularTotalModal()" class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 font-semibold focus:ring-2 focus:ring-auditorioRed focus:outline-none">
+                                <option value="1">1 Boleto</option>
+                                <option value="2">2 Boletos</option>
+                                <option value="3">3 Boletos</option>
+                                <option value="4">4 Boletos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-700 text-xs uppercase mb-1">Hora de Función</label>
+                            <input type="text" value="20:00 HRS (8:00 PM)" readonly class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 font-bold text-gray-700">
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-amber-800 font-bold block">PRECIO DE REFERENCIA (NO SE COBRA):</span>
+                            <span id="text-total-pagar" class="text-2xl font-black text-auditorioBlack">$1,800 MXN</span>
+                        </div>
+                        <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-2.5 py-1 rounded-full uppercase">
+                            Emisión sin cobro real
+                        </span>
+                    </div>
+
+                    <button id="btn-confirmar-modal" onclick="confirmarCompraModal()" class="w-full bg-auditorioRed hover:bg-auditorioRedHover text-white font-black text-sm uppercase tracking-wider py-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        <span>CONFIRMAR BOLETOS GRATIS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Paso 2: Vista Previa del Boleto -->
+            <div id="paso-boleto" class="hidden space-y-6"><p id="resultado-boleto" class="text-sm text-green-800 bg-green-50 p-3 rounded-lg"></p>
+                <div class="text-center space-y-1">
+                    <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full inline-block">
+                        ¡BOLETO(S) EMITIDO(S) REALMENTE EN ORACLE!
+                    </span>
+                    <h4 class="text-xl font-bold text-auditorioBlack">Boleto Oficial Emitido</h4>
+                </div>
+
+                <div id="area-boleto-pdf" style="background-color: #F9F6EE; border: 4px solid #D4AF37; color: #111111; padding: 20px; border-radius: 12px; font-family: Arial, sans-serif; box-sizing: border-box; width: 100%;">
+                    <div style="background-color: #D4AF37; margin: -20px -20px 16px -20px; padding: 12px; color: #ffffff; text-align: center; font-weight: bold; font-size: 15px;">
+                        Auditorio Plata - Juan Gabriel - Concierto Navideño
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <div style="font-size: 12px; line-height: 1.8; flex-grow: 1;">
+                            <p style="margin: 2px 0;"><strong>Folio de Acceso:</strong> <span id="pdf-folio" style="font-weight: bold; color: #B8860B; font-size: 15px;">#...</span></p>
+                            <p style="margin: 2px 0;"><strong>Fecha de Emisión:</strong> <span id="pdf-fecha">...</span></p>
+                            <p style="margin: 2px 0;"><strong>Hora del Concierto:</strong> <span>8:00 PM (20:00 HRS)</span></p>
+                            
+                            <div style="background-color: #FFF8DC; border: 1px solid #D4AF37; padding: 8px; border-radius: 8px; margin-top: 8px;">
+                                <span style="font-weight: bold; color: #8B4513; display: block; font-size: 10px; text-transform: uppercase;">Zona Seleccionada:</span>
+                                <span id="pdf-asiento" style="font-weight: bold; font-size: 12px; color: #000000;">Preferente Planta Baja</span>
+                            </div>
+
+                            <p style="font-size: 9px; color: #666666; margin-top: 6px; font-family: monospace; word-break: break-all;">
+                                <strong>FIRMA HMAC SHA256:</strong> <span id="pdf-hash">...</span>
+                            </p>
+                        </div>
+
+                        <div style="padding: 8px; background-color: #ffffff; border: 1px solid #D4AF37; border-radius: 8px; text-align: center; width: 120px; flex-shrink: 0;">
+                            <div id="qrcode-container" style="display: flex; justify-content: center;"></div>
+                            <span style="font-size: 8px; font-weight: bold; color: #555555; display: block; margin-top: 4px;">Escaneable en Puerta</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 pt-2">
+                    <button onclick="descargarPDFCaptura()" class="w-1/2 bg-auditorioBlack hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition flex items-center justify-center space-x-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>DESCARGAR COPIA VISUAL</span>
+                    </button>
+
+                    <button onclick="cerrarModalCompra()" class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition text-center">
+                        CERRAR VENTANA
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL 2: PANTALLA PROFESIONAL DE "SOLD OUT" / AGOTADO -->
+    <div id="modal-soldout" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-red-500/40 rounded-3xl max-w-lg w-full p-8 text-center text-white shadow-2xl relative fade-in overflow-hidden">
+            
+            <!-- Adorno traslúcido -->
+            <div class="absolute -right-12 -top-12 opacity-10 pointer-events-none">
+                <i data-lucide="ticket-x" class="w-64 h-64 text-red-500"></i>
+            </div>
+
+            <!-- Botón Cerrar -->
+            <button onclick="cerrarModalSoldOut()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-full hover:bg-white/10 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Icono Encabezado -->
+            <div class="w-20 h-20 bg-red-950/80 border-2 border-red-500 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg shadow-red-950/50">
+                <i data-lucide="lock" class="w-10 h-10"></i>
+            </div>
+
+            <!-- Insignia -->
+            <span class="bg-red-600 text-white font-black text-xs uppercase tracking-widest px-4 py-1.5 rounded-full inline-block shadow-md mb-3">
+                ENTRADAS AGOTADAS • SOLD OUT
+            </span>
+
+            <h3 id="soldout-nombre-evento" class="text-2xl md:text-3xl font-black font-serif uppercase tracking-tight text-white mb-2">
+                Juan Gabriel - Concierto Navideño
+            </h3>
+
+            <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                Lo sentimos, todos los boletos para este espectáculo han sido vendidos en su totalidad. El control transaccional de Oracle DB ha cerrado la emisión.
+            </p>
+
+            <!-- Detalles de Control del Servidor -->
+            <div class="bg-black/60 rounded-2xl p-4 border border-white/10 text-xs text-left space-y-2 mb-6">
+                <div class="flex justify-between items-center text-gray-400">
+                    <span>Estado HTTP Servidor:</span>
+                    <span class="font-mono font-bold text-red-400 bg-red-950/60 px-2 py-0.5 rounded border border-red-800/40">409 AFORO AGOTADO</span>
+                </div>
+                <div class="flex justify-between items-center text-gray-400">
+                    <span>Aforo Alcanzado:</span>
+                    <span class="font-bold text-white"><span id="agotado-cifras">Consultando Oracle...</span></span>
+                </div>
+                <div class="flex justify-between items-center text-gray-400">
+                    <span>Protección de Fila:</span>
+                    <span class="font-bold text-emerald-400">SELECT ... FOR UPDATE WAIT 15</span>
+                </div>
+            </div>
+
+            <button onclick="cerrarModalSoldOut()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-wider py-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>ENTENDIDO / REGRESAR A CARTELERA</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 3: SIMULADOR DE SPAWNER -->
+    <div id="modal-spawner" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-auditorioDarkGray text-white rounded-2xl max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-gray-700 relative fade-in max-h-[92vh] flex flex-col">
+            <button onclick="toggleSpawnerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-800 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex items-center space-x-2 text-yellow-400 font-bold text-xs uppercase mb-1">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                <span>SIMULADOR DE ALGORITMOS DE CONCURRENCIA SO</span>
+            </div>
+
+            <h3 class="text-2xl font-black text-white font-serif mb-2">Prueba de solicitudes HTTP concurrentes · Oracle FOR UPDATE</h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-black/40 p-4 rounded-xl border border-gray-800 text-xs mb-4">
+                <div>
+                    <label class="text-gray-400 block font-bold mb-1">Solicitudes desde el navegador (máx. 100)</label>
+                    <input type="number" id="spawner-threads" value="100" min="1" max="100" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-white font-bold">
+                </div>
+                <div>
+                    <label class="text-gray-400 block font-bold mb-1">Mecanismo</label>
+                    <select id="spawner-mode" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-white font-bold">
+                        <option value="skiplocked">API Oracle con bloqueo FOR UPDATE (sincronizado)</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="btn-ejecutar-spawner" onclick="ejecutarSimulacionSpawner()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xs uppercase py-2 rounded transition flex items-center justify-center space-x-1 shadow">
+                        <i data-lucide="play" class="w-4 h-4 fill-black"></i>
+                        <span>LANZAR RÁFAGA</span>
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-xs text-amber-200 mb-3">El navegador ejecuta peticiones concurrentes, NO hilos del sistema operativo. Para la rúbrica de 100 hilos, ejecuta <code>spawner.py</code> desde otra PC. Esta prueba emite boletos de verdad.</p><div class="flex-grow bg-black rounded-xl p-4 font-mono text-[11px] border border-gray-800 text-green-400 overflow-y-auto terminal-scroll min-h-[220px] space-y-1">
+                <div id="terminal-logs"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL DE DETALLES DE LOS CONCIERTOS -->
+    <div id="modal-detalles" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-7 max-w-lg w-full shadow-2xl relative">
+        <button onclick="cerrarDetalles()" class="absolute right-4 top-4 text-gray-500 hover:text-red-600" aria-label="Cerrar detalles">✕</button>
+        <p class="text-xs text-red-600 font-black uppercase">Cartelera de demostración · Oracle XE</p>
+        <h3 id="detalle-titulo" class="text-2xl font-serif font-black mt-2 mb-4">Concierto</h3>
+        <div id="detalle-cuerpo" class="text-gray-700 text-sm leading-relaxed space-y-2"></div>
+        <button id="detalle-reservar" class="mt-6 w-full bg-auditorioRed text-white rounded-lg px-4 py-3 font-bold">Reservar boleto gratuito</button>
+      </div>
+    </div>
+
+    <!-- JAVASCRIPT CON AUTO-POLLING Y MODAL PROFESIONAL -->
+    <script src="{{ url_for('static', filename='cartelera.js') }}"></script>
+</body>
+</html>

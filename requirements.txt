@@ -1,0 +1,9 @@
+Flask>=3.1,<4
+oracledb>=2.0,<27
+waitress>=3.0,<4
+python-dotenv>=1.0,<2
+qrcode>=8.0,<9
+Pillow>=10.0,<13
+reportlab>=4.0,<5
+requests>=2.31,<3
+tzdata>=2025.1

@@ -1,0 +1,15 @@
+AUDITORIO PLATA - CLIENTE PC 2 / PC 3 (Windows PowerShell)
+
+1. Instala Python. Abre PowerShell en esta carpeta.
+2. Crea entorno e instala:
+   py -m venv .venv
+   .\.venv\Scripts\python.exe -m pip install -r requirements_cliente.txt
+3. En PC 1 verifica la IP con ipconfig. Desde tu PC abre:
+   http://IP_PC1:5000/api/salud
+4. PRUEBA OFICIAL 100/60 (solo PC 2):
+   .\.venv\Scripts\python.exe spawner.py --url http://IP_PC1:5000 --equipo PC2 --total 100 --hilos 100 --duracion 60 --margen 10 --distribucion uniforme --semaforo 20
+5. Para PC 3 de prueba adicional: --equipo PC3 --total 50 --hilos 50.
+6. Guarda carpeta resultados/ CSV y JSON.
+7. Consulta README completo en proyecto principal para prueba lab-sin/lab-con.
+
+Importante: NO necesitas instalar Oracle ni conocer la contrasena Oracle.
